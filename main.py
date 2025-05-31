@@ -172,7 +172,7 @@ def main():
     # Check if the file exists.
     if check_file_exists(html_file_path) == False:
         # If the file does not exist, download it using Selenium.
-        url = "https://buyat.ppg.com/EHSDocumentManagerPublic/documentSearchInnerFrame.aspx?NameCondition=BeginsWith&NameValue=*&CodeCondition=BeginsWith&CodeValue=&CompCondition=BeginsWith&CompValue=&Form=&SortBy=ProductName&Language=&SBU=&From=&To=&SuppressSearchControls=False&AlwaysShowSearchResults=False&PageSize=1000&FolderID1=0&FolderID2=0&FolderID3=0&FolderID4=0&FolderID5=0&FolderID6=0&FolderID7=0&FolderID8=0&FolderID9=0&FolderID10=0&SearchAllPublicFolders=True"
+        url = "https://www.scjp.com/en-us/safety-data-sheets?search=windex&page=0"
         # Save the HTML content to a file.
         save_html_with_selenium(url, html_file_path)
         print(f"File {html_file_path} has been created.")

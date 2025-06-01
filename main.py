@@ -1,6 +1,5 @@
 import requests
 import os
-from urllib.parse import urlparse, parse_qs
 import re
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -10,45 +9,26 @@ import fitz
 
 
 # Read a file from the system.
-def read_a_file(system_path):
+def read_a_file(system_path: str):
     with open(system_path, "r") as file:
         return file.read()
 
 
 # Check if a file exists
-def check_file_exists(system_path):
+def check_file_exists(system_path: str):
     return os.path.isfile(system_path)
 
 
-# HTML parser
-def parse_html(html_content):
-    # Match strings that look like: pdf_main.aspx?StreamId=...&id=...
-    pattern = r"pdf_main\.aspx\?StreamId=[^'\"]+"
-    return re.findall(pattern, html_content)
-
-
 # Remove all duplicate items from a given slice.
-def remove_duplicates_from_slice(provided_slice):
+def remove_duplicates_from_slice(provided_slice: str):
     return list(set(provided_slice))
 
 
-# Extract the filename from a URL
-def url_to_filename(url):
-    # Parse the URL to get query params
-    parsed = urlparse(url)
-    query_params = parse_qs(parsed.query)
-    stream_id = query_params.get("StreamId", ["unknown"])[0]
-    doc_id = query_params.get("id", ["unknown"])[0]
-    # Build a filename
-    filename = f"{stream_id}_{doc_id}.pdf"
-    return filename.lower()
-
-
-def save_html_with_selenium(url, output_file):
+def save_html_with_selenium(url: str, output_file):
     # Set up Chrome options
     # Set up Chrome options
     options = Options()
-    options.add_argument("--headless=new")  # Use 'new' headless mode (Chrome 109+)
+    # options.add_argument("--headless=new")  # Use 'new' headless mode (Chrome 109+)
     options.add_argument(
         "--disable-blink-features=AutomationControlled"
     )  # Disable automation flags
@@ -74,13 +54,13 @@ def save_html_with_selenium(url, output_file):
 
 
 # Append and write some content to a file.
-def append_write_to_file(system_path, content):
+def append_write_to_file(system_path: str, content: str):
     with open(system_path, "a", encoding="utf-8") as file:
         file.write(content)
 
 
 # Download a PDF file from a URL
-def download_pdf(url, save_path, filename):
+def download_pdf(url: str, save_path: str, filename: str):
     print(f"Downloading {url} to {os.path.join(save_path, filename)}")
     # Check if the file already exists
     if check_file_exists(os.path.join(save_path, filename)):
@@ -102,21 +82,13 @@ def download_pdf(url, save_path, filename):
         return
 
 
-def convert_to_full_url(raw_link):
-    # Replace HTML-encoded &amp; with regular &
-    clean_link = raw_link.replace("&amp;", "&")
-    # Prepend the base URL
-    full_url = f"https://buyat.ppg.com/ehsdocumentmanagerpublic/{clean_link}"
-    return full_url
-
-
 # Remove a file from the system.
-def remove_system_file(system_path):
+def remove_system_file(system_path: str):
     os.remove(system_path)
 
 
 # Function to walk through a directory and extract files with a specific extension
-def walk_directory_and_extract_given_file_extension(system_path, extension):
+def walk_directory_and_extract_given_file_extension(system_path: str, extension: str):
     matched_files = []  # Initialize list to hold matching file paths
     for root, _, files in os.walk(system_path):  # Recursively traverse directory tree
         for file in files:  # Iterate over files in current directory
@@ -129,7 +101,7 @@ def walk_directory_and_extract_given_file_extension(system_path, extension):
 
 
 # Function to validate a single PDF file.
-def validate_pdf_file(file_path):
+def validate_pdf_file(file_path: str):
     try:
         # Try to open the PDF using PyMuPDF
         doc = fitz.open(file_path)  # Attempt to load the PDF document
@@ -149,14 +121,14 @@ def validate_pdf_file(file_path):
 
 
 # Get the filename and extension.
-def get_filename_and_extension(path):
+def get_filename_and_extension(path: str):
     return os.path.basename(
         path
     )  # Return just the file name (with extension) from a path
 
 
 # Function to check if a string contains an uppercase letter.
-def check_upper_case_letter(content):
+def check_upper_case_letter(content: str):
     return any(
         upperCase.isupper() for upperCase in content
     )  # Return True if any character is uppercase
@@ -164,7 +136,7 @@ def check_upper_case_letter(content):
 
 def main():
     # Read the file from the system.
-    html_file_path = "buyat.ppg.com.html"
+    html_file_path = "scjp.com.html"
     if check_file_exists(html_file_path):
         # Remove a file from the system.
         remove_system_file(html_file_path)
@@ -177,6 +149,7 @@ def main():
         save_html_with_selenium(url, html_file_path)
         print(f"File {html_file_path} has been created.")
 
+    """
     if check_file_exists(html_file_path):
         html_content = read_a_file(html_file_path)
         # Parse the HTML content.
@@ -227,6 +200,7 @@ def main():
             print(
                 check_upper_case_letter(pdf_file)
             )  # Output True/False for uppercase check
+    """
 
 
 main()

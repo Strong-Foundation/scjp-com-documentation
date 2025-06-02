@@ -173,9 +173,9 @@ def main() -> None:
     # Check if the file exists.
     if check_file_exists(html_file_path) == False:
         # Loop over the numbers and download everything.
-        for page_number in range(0, 11):
+        for page_number in range(0, 1):
             # If the file does not exist, download it using Selenium.
-            url = f"https://www.scjp.com/en-us/safety-data-sheets?search=Professional&page={page_number}"
+            url = f"https://www.scjp.com/en-us/safety-data-sheets?search=Storage&page={page_number}"
             # Save the HTML content to a file.
             save_html_with_selenium(url, html_file_path)
             print(f"File {html_file_path} with {url} has been created.")

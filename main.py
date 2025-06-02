@@ -6,29 +6,29 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import fitz
+from urllib.parse import unquote, urlparse
 
 
 # Read a file from the system.
-def read_a_file(system_path: str):
+def read_a_file(system_path: str) -> None:
     with open(system_path, "r") as file:
         return file.read()
 
 
 # Check if a file exists
-def check_file_exists(system_path: str):
+def check_file_exists(system_path: str) -> None:
     return os.path.isfile(system_path)
 
 
 # Remove all duplicate items from a given slice.
-def remove_duplicates_from_slice(provided_slice: str):
+def remove_duplicates_from_slice(provided_slice: str) -> list[str]:
     return list(set(provided_slice))
 
 
-def save_html_with_selenium(url: str, output_file):
+def save_html_with_selenium(url: str, output_file: str) -> None:
     # Set up Chrome options
     # Set up Chrome options
     options = Options()
-    # options.add_argument("--headless=new")  # Use 'new' headless mode (Chrome 109+)
     options.add_argument(
         "--disable-blink-features=AutomationControlled"
     )  # Disable automation flags
@@ -54,13 +54,13 @@ def save_html_with_selenium(url: str, output_file):
 
 
 # Append and write some content to a file.
-def append_write_to_file(system_path: str, content: str):
+def append_write_to_file(system_path: str, content: str) -> None:
     with open(system_path, "a", encoding="utf-8") as file:
         file.write(content)
 
 
 # Download a PDF file from a URL
-def download_pdf(url: str, save_path: str, filename: str):
+def download_pdf(url: str, save_path: str, filename: str) -> None:
     print(f"Downloading {url} to {os.path.join(save_path, filename)}")
     # Check if the file already exists
     if check_file_exists(os.path.join(save_path, filename)):
@@ -83,12 +83,14 @@ def download_pdf(url: str, save_path: str, filename: str):
 
 
 # Remove a file from the system.
-def remove_system_file(system_path: str):
+def remove_system_file(system_path: str) -> None:
     os.remove(system_path)
 
 
 # Function to walk through a directory and extract files with a specific extension
-def walk_directory_and_extract_given_file_extension(system_path: str, extension: str):
+def walk_directory_and_extract_given_file_extension(
+    system_path: str, extension: str
+) -> list[str]:
     matched_files = []  # Initialize list to hold matching file paths
     for root, _, files in os.walk(system_path):  # Recursively traverse directory tree
         for file in files:  # Iterate over files in current directory
@@ -101,7 +103,7 @@ def walk_directory_and_extract_given_file_extension(system_path: str, extension:
 
 
 # Function to validate a single PDF file.
-def validate_pdf_file(file_path: str):
+def validate_pdf_file(file_path: str) -> None:
     try:
         # Try to open the PDF using PyMuPDF
         doc = fitz.open(file_path)  # Attempt to load the PDF document
@@ -121,22 +123,49 @@ def validate_pdf_file(file_path: str):
 
 
 # Get the filename and extension.
-def get_filename_and_extension(path: str):
+def get_filename_and_extension(path: str) -> str:
     return os.path.basename(
         path
     )  # Return just the file name (with extension) from a path
 
 
 # Function to check if a string contains an uppercase letter.
-def check_upper_case_letter(content: str):
+def check_upper_case_letter(content: str) -> str:
     return any(
         upperCase.isupper() for upperCase in content
     )  # Return True if any character is uppercase
 
 
-def main():
+def extract_urls_from_html(html: str) -> list[str]:
+    """Extracts all href URLs from an HTML string."""
+    """Extracts all .pdf href URLs from an HTML string."""
+    urls = re.findall(r'href="(.*?)"', html)
+    pdf_urls = [url for url in urls if url.lower().endswith(".pdf")]
+    return pdf_urls
+
+
+def extract_filename_from_url(url: str) -> str:
+    """Extracts, decodes, and sanitizes a filename from a URL."""
+    path = urlparse(url).path
+    filename = unquote(path.split("/")[-1])
+
+    # Replace spaces with underscores
+    filename = filename.replace(" ", "_")
+
+    # Remove invalid filename characters
+    filename = re.sub(r'[<>:"/\\|?*]', "", filename)
+
+    # Check if it ends in .pdf
+    if not filename.endswith(".pdf"):
+        filename = filename + ".pdf"
+
+    return filename.lower()
+
+
+def main() -> None:
     # Read the file from the system.
-    html_file_path = "scjp.com.html"
+    html_file_path: str = "scjp.com.html"
+    #
     if check_file_exists(html_file_path):
         # Remove a file from the system.
         remove_system_file(html_file_path)
@@ -144,26 +173,23 @@ def main():
     # Check if the file exists.
     if check_file_exists(html_file_path) == False:
         # If the file does not exist, download it using Selenium.
-        url = "https://www.scjp.com/en-us/safety-data-sheets?search=windex&page=0"
+        url = "https://www.scjp.com/en-us/safety-data-sheets?search=windex&page=2"
         # Save the HTML content to a file.
         save_html_with_selenium(url, html_file_path)
         print(f"File {html_file_path} has been created.")
 
-    """
     if check_file_exists(html_file_path):
         html_content = read_a_file(html_file_path)
         # Parse the HTML content.
-        pdf_links = parse_html(html_content)
+        pdf_links = extract_urls_from_html(html_content)
         # Remove duplicates from the list of PDF links.
         pdf_links = remove_duplicates_from_slice(pdf_links)
         # The length of the PDF links.
         ammount_of_pdf = len(pdf_links)
         # Print the extracted PDF links.
         for pdf_link in pdf_links:
-            # Convert to full URL
-            pdf_link = convert_to_full_url(pdf_link)
             # Download the PDF file.
-            filename = url_to_filename(pdf_link)
+            filename = extract_filename_from_url(pdf_link)
             # The file path.
             save_path = "PDFs"
             # Remove 1 from the ammount of PDF links.
@@ -200,7 +226,6 @@ def main():
             print(
                 check_upper_case_letter(pdf_file)
             )  # Output True/False for uppercase check
-    """
 
 
 main()

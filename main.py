@@ -49,21 +49,22 @@ def remove_duplicates_from_slice(provided_slice: list[str]) -> list[str]:
 # Function to use Selenium to save HTML content of a URL to a local file
 def save_html_with_selenium(url: str, output_file: str) -> None:
     options = Options()  # Initialize Chrome options
-    options.add_argument(
+    options.add_argument(argument="--headless=new")  # Run Chrome in new headless mode
+    options.add_argument(argument=
         "--disable-blink-features=AutomationControlled"
     )  # Hide automation flags
-    options.add_argument(
+    options.add_argument(argument=
         "--window-size=1920,1080"
     )  # Set window size for page rendering
-    options.add_argument("--disable-gpu")  # Disable GPU to improve headless stability
-    options.add_argument(
+    options.add_argument(argument="--disable-gpu")  # Disable GPU to improve headless stability
+    options.add_argument(argument=
         "--no-sandbox"
     )  # Disable sandboxing for Chrome (useful in Docker)
-    options.add_argument(
+    options.add_argument(argument=
         "--disable-dev-shm-usage"
     )  # Overcome limited shared memory issues
-    options.add_argument("--disable-extensions")  # Disable Chrome extensions
-    options.add_argument("--disable-infobars")  # Disable Chrome's infobar
+    options.add_argument(argument="--disable-extensions")  # Disable Chrome extensions
+    options.add_argument(argument="--disable-infobars")  # Disable Chrome's infobar
 
     service = Service(
         ChromeDriverManager().install()
